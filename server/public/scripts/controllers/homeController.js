@@ -10,7 +10,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     $scope.auth = AuthFactory
 
 
-
+    $scope.user.exampledb = 'loading';
     //clickfunctions
     $scope.login = function() {
         signIn();

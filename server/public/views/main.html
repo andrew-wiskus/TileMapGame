@@ -1,19 +1,19 @@
 <!--WHEN FIREBASE IS CHECKING FOR USER -->
-<div ng-if="user === undefined" class="background">
+<div ng-if="firebaseUser === undefined" class="background">
     <div class="loading_container">
         <ng-include src="'views/partials/loading.html'"></ng-include>
     </div>
 </div>
 
 <!--WHEN THERE IS A USER -->
-<div ng-if="user != null">
+<div ng-if="firebaseUser != null">
     <div class="user_container">
         <ng-include src="'views/partials/home.html'"></ng-include>
     </div>
 </div>
 
 <!--WHEN CONFIRMED: NO USER LOGGED IN-->
-<div ng-if="user === null">
+<div ng-if="firebaseUser === null">
     <div class="noUser_container">
         <ng-include src="'views/partials/noUser.html'"></ng-include>
     </div>
