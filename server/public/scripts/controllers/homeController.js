@@ -1,4 +1,4 @@
-myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", "$location", "$anchorScroll", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $location, $anchorScroll, AuthFactory, UserFactory) {
+myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $location, AuthFactory, UserFactory) {
 
 
     $scope.user = {};
@@ -8,9 +8,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     var signIn = userFactory.signIn();
     var signOut = userFactory.signOut();
     $scope.auth = AuthFactory
-
-
-    $scope.user.exampledb = 'loading';
+    $scope.user.exampledb = 'loading'; //kind of hacky way to make a loading screen.. there are much better ways using the same concept :P
     //clickfunctions
     $scope.login = function() {
         signIn();
