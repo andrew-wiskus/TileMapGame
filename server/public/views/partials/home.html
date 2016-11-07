@@ -1,0 +1,13 @@
+<button ng-click="logOff()">log off</button>
+<p>user: {{user.email}}</p>
+<p>id: {{user.uid}}</p>
+<input type="text" ng-model="dataInput" ng-value="dataInput"></input>
+<button ng-click="postData(dataInput)">ADD DATA TO DB</button>
+
+<h1 ng-if="user.exampledb.length != 0"> DATA LIST </h1>
+<div ng-repeat="data in user.exampledb">
+  <h3><span class="dataHeader">data:</span>{{data.data}}</h3>
+  <p>key: {{data.key}} </p>
+  <p>date added: {{data.date}} </p>
+</div>
+<!-- <p>firebaseUser: {{firebaseUser}}</p> -->
