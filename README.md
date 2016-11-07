@@ -1,4 +1,6 @@
 
+###Note: This template uses nodejs to host the development server.
+####firebase only exists in the public folder :) 
 1. Log into https://firebase.google.com/
 2. Go to https://console.firebase.google.com/
 3. Create new project
