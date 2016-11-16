@@ -17,19 +17,20 @@ myApp.controller("GameBoardController", ["$scope", "$http", "$document", "$windo
 
     function makeTileGrid(){
       //assuming width is > height;
-      var cols = 300;
-      var rows = 300;
+      var cols = 100;
+      var rows = 100;
 
       var waterSeed = [Math.floor((Math.random() * 300) + 1), Math.floor((Math.random() * 300) + 1)];
       var waterWidth = Math.floor((Math.random() * 100) + 1)
       var waterHeight = Math.floor((Math.random() * 100) + 1)
 
-      
+
       console.log(waterSeed);
       for(var x = 0; x < cols; x++){
 
         for(var y = 0; y < rows; y++){
           var id = Math.floor((Math.random() * 6) + 1);
+          if(y)
           $scope.gameTiles.push({x: x, y:y, width: 16, height: 16, id: id});
         }
       }
