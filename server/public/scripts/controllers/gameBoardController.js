@@ -1,4 +1,4 @@
-myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $location, AuthFactory, UserFactory) {
+myApp.controller("GameBoardController", ["$scope", "$http", "$document", "$window", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $window, $location, AuthFactory, UserFactory) {
 
 
     $scope.user = {};
@@ -8,59 +8,46 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     var signIn = userFactory.signIn();
     var signOut = userFactory.signOut();
     $scope.auth = AuthFactory
-    $scope.user.exampledb = 'loading'; //kind of hacky way to make a loading screen.. there are much better ways using the same concept :P
-    //clickfunctions
-    $scope.login = function() {
-        signIn();
-    }
-    $scope.logOff = function(){
-        signOut();
-    }
-    $scope.postData = function(data) {
-        var datestr = new Date()
-        datestr = datestr.toString();
-        console.log(datestr);
-        var dbRef = firebase.database()
-            .ref()
-            .child('exampledb')
-            .child($scope.user.uid)
-            .push({
-                date: datestr,
-                data: data
-            })
+
+    var boardHeight = window.innerHeight;
+    var boardWidth = window.innerWidth
+
+    $scope.gameTiles = [];
+    console.info('window size: ', boardHeight, 'x', boardWidth);
+
+    function makeTileGrid(){
+      //assuming width is > height;
+      var cols = 300;
+      var rows = 300;
+
+      var waterSeed = [Math.floor((Math.random() * 300) + 1), Math.floor((Math.random() * 300) + 1)];
+      var waterWidth = Math.floor((Math.random() * 100) + 1)
+      var waterHeight = Math.floor((Math.random() * 100) + 1)
+
+      
+      console.log(waterSeed);
+      for(var x = 0; x < cols; x++){
+
+        for(var y = 0; y < rows; y++){
+          var id = Math.floor((Math.random() * 6) + 1);
+          $scope.gameTiles.push({x: x, y:y, width: 16, height: 16, id: id});
+        }
+      }
+      console.log($scope.gameTiles.length);
+
     }
 
-
-
+    makeTileGrid();
     //MARK:------FIREBASE BRAIN
     //listens to changes for database refrences. ie: task added to db.ref(user.uid) -> fires function to update scope.
     //ps. this is always running and listening for changes, even user == null.
     $scope.auth.$onAuthStateChanged(function(user) {
         $scope.firebaseUser = user;
-        console.log('firebase user: ', user);
+
         if (user != null) {
+
             $scope.user.uid = user.uid;
             $scope.user.email = user.email;
-
-            //LISTNER: examppledb
-            var exampleListener = firebase.database()
-            .ref()
-            .child('exampledb')
-            .child(user.uid)
-
-            //.on('value', -> is a catch all. you can use .on('child_added') and other listeners for optimization;
-            exampleListener.on('value', data=>{ //es6 == ('value', function(data){});
-              console.log('database: ', data.val());
-              var tempArray = makeSnapshotObject(data.val());
-
-              $timeout(function(){ //need $timeout in all firebase listeners because its asynch :)
-                $scope.user.exampledb = tempArray
-                console.log('user:', $scope.user);
-              }, 0) // setting timer at 0 makes sure the function runs after data is loaded
-
-
-            });
-
 
         }
     });
