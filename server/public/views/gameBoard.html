@@ -1,7 +1,8 @@
 <div id="game">
   <div class="screen" id="gameBoard">
-    <div ng-repeat="tile in camera" style="width: {{tile.width}}px; height: {{tile.height}}px; float: left; background-image:url('../styles/{{tile.texture}}')">
-
+    <div ng-repeat="tile in camera track by $index"
+    ng-click="clickedTile(tile, $index)"
+    style="width: {{tile.width}}px; height: {{tile.height}}px; float: left; background-image:url('../styles/{{tile.texture}}')">
     </div>
   </div>
 </div>
