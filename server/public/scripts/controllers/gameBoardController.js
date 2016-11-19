@@ -1,271 +1,122 @@
 myApp.controller("GameBoardController", ["$scope", "$http", "$document", "$window", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $window, $location, AuthFactory, UserFactory) {
 
-
-    $scope.user = {};
-    $scope.firebaseUser;
-    //auth variables
-    var userFactory = UserFactory;
-    var signIn = userFactory.signIn();
-    var signOut = userFactory.signOut();
-    $scope.auth = AuthFactory
-
     var boardHeight = window.innerHeight;
     var boardWidth = window.innerWidth
+    var tileSize = boardWidth/40;
+    var initTime = Date.now();
 
-    $scope.gameTiles = [];
-    console.info('window size: ', boardHeight, 'x', boardWidth);
+    //holds all tiles in view;
+    $scope.camera = [];
+    var cameraPosition = {x:50,y:50};
+    //holds full world map
+    var worldMap = makeTileGrid();
+    console.log(worldMap);
 
-    function makeTileGrid(){
-      //assuming width is > height;
-      var cols = 100;
-      var rows = 100;
 
+//MARK: CAMERA
+    function findCurrentView(position){
+      var x = position.x;
+      var y = position.y;
+
+
+      var view = worldMap.slice(y-11, y+11);
+      view = view.map(row=>{
+        return row.slice(x-20,x+20);
+      });
+
+      var camera = [];
+      view.forEach(row=>{
+        camera.push(...row);
+      })
+
+      return camera;
+    }
+
+    $scope.camera = findCurrentView(cameraPosition);
+
+//MARK: MAP BUILDING FUNCTIONS
+    function getTextureFromID(){
+      var id = Math.floor((Math.random() * 6) + 1);
+      return `grass${id}.png`
+    }
+    function makeWaterSeed(){
+      //wip
       var waterSeed = [Math.floor((Math.random() * 300) + 1), Math.floor((Math.random() * 300) + 1)];
       var waterWidth = Math.floor((Math.random() * 100) + 1)
       var waterHeight = Math.floor((Math.random() * 100) + 1)
+      return null;
+    }
+    //NOTE: put into worker;
+    function makeTileGrid(){
+
+      var gameMap = [];
+      var row = [];
+      //assuming width is > height;
+      var cols = 1000;
+      var rows = 1000;
+      var texture = '';
+      var width = tileSize;
+      var height = tileSize;
+      var waterSeed = makeWaterSeed();
 
 
-      console.log(waterSeed);
+      //make tilemap, proc gen style :D
+      //will eventually be filling from gamemap database instead.. 2 many proc gens in games.
       for(var x = 0; x < cols; x++){
-
+        row = [];
         for(var y = 0; y < rows; y++){
-          var id = Math.floor((Math.random() * 6) + 1);
-          if(y)
-          $scope.gameTiles.push({x: x, y:y, width: 16, height: 16, id: id});
-        }
-      }
-      console.log($scope.gameTiles.length);
 
+          var items = [];
+          texture = getTextureFromID()
+          row.push({x: x, y:y, width: width, height: height, texture: texture, items: items});
+        }
+        gameMap.push(row);
+      }
+
+      return gameMap;
     }
 
-    makeTileGrid();
-    //MARK:------FIREBASE BRAIN
-    //listens to changes for database refrences. ie: task added to db.ref(user.uid) -> fires function to update scope.
-    //ps. this is always running and listening for changes, even user == null.
-    $scope.auth.$onAuthStateChanged(function(user) {
-        $scope.firebaseUser = user;
 
-        if (user != null) {
 
-            $scope.user.uid = user.uid;
-            $scope.user.email = user.email;
+    $document.bind("keydown", function(event) {
+        console.log(event.key);
 
+        switch(event.key){
+          case "ArrowUp":
+          cameraPosition.y -= 1;
+          console.log(cameraPosition);
+          $scope.$apply(function(){
+            $scope.camera = findCurrentView(cameraPosition)
+          })
+          break;
+          case "ArrowDown":
+          cameraPosition.y += 1;
+          console.log(cameraPosition);
+          $scope.$apply(function(){
+            $scope.camera = findCurrentView(cameraPosition)
+          })
+          break;
+          case "ArrowLeft":
+          cameraPosition.x -= 1;
+          console.log(cameraPosition);
+          $scope.$apply(function(){
+            $scope.camera = findCurrentView(cameraPosition)
+          })
+          break;
+          case "ArrowRight":
+          cameraPosition.x += 1;
+          console.log(cameraPosition);
+          $scope.$apply(function(){
+            $scope.camera = findCurrentView(cameraPosition)
+          })
+          break;
+
+        }
+        if (event.key == "ArrowUp") {
+
+            event.preventDefault(); //would prevent from tabbing all over the screen
         }
     });
 
-
-
-
-    //UTILITY FUNCTIONS
-    function makeSnapshotObject(data) {
-        var tempArray = [];
-        _.pairs(data) //uses underscorejs to format object and update $scope.user.taskList
-            .forEach(function(dataArray) {
-                dataArray[1].key = dataArray[0];
-                tempArray.push(
-                    dataArray[1]
-                )
-            })
-
-        return tempArray;
-    }
-
-
-
-    //------------------------------------------------------------------------------
-    //--------------------------EXAMPLE FIREBASE FUNCTIONS--------------------------
-    //------------------------------------------------------------------------------
-
-    //MARK:------DELETE REQUEST
-    // function deleteTask(task) {
-    //     var dbRef = firebase.database()
-    //         .ref()
-    //         .child('taskdb')
-    //         .child($scope.user.uid)
-    //         .child(task.key)
-    //         .remove();
-    // }
-
-    //MARK: POST REQUEST ------------------------------------------------
-    // function postData(data){
-    //   var datestr = new Date()
-    //   dateStr = dateStr.toString();
-    //   var dbRef = firebase.database()
-    //   .ref()
-    //   .child('exampledb')
-    //   .child($scope.user.uid)
-    //   .push({date: datestr, data: data})
-    // }
-
-    //MARK: GET REQUEST --------------------------------------------------
-    // function updateUserObject() {
-    //
-    //     var exampleDB = firebase.database()
-    //         .ref()
-    //         .child('exampleDB')
-    //         .child(user.uid); //CREATES FIREBASE REFRENCE FOR ALL DATA CREATED BY CURRENT USER
-    //
-    //     var tempArray = makeSnapshotObject(data); //NECESSARY TO GET KEYS OF OBJECTS
-    //
-    //
-    //     //updates $scope.user
-    //     //NOTE: NEED $TIMEOUT IN AN ASYNC CALL VIA FIREBASE
-    //     $timeout(function() {
-    //         $scope.user.db = tempArray;
-    //         findFoldersToShow();
-    //     }, 0);
-    //
-    //
-    // }
-
-    //MARK: PUT REQUEST --------------------------------------------------
-    // function updateListItem(task) {
-    //     var dbRef = firebase.database()
-    //         .ref()
-    //         .child('taskdb')
-    //         .child($scope.user.uid)
-    //         .child(task.key)
-    //         .child('is_complete')
-    //         .set(true)
-    //
-    //     // NOTE: if you update multiple lines you must set the FULL object
-    //     //
-    //     //
-    //     //     var dbRef = firebase.database() //creates ref
-    //     //         .ref()
-    //     //         .child('taskdb')
-    //     //         .child($scope.user.uid)
-    //     //         .child(task.key) //finds the tasks key
-    //     //         .set({ //replaces the full object. (FULL OBJECT) v imporant.
-    //     //             date: task.date,
-    //     //             title: task.title,
-    //     //             scrum: task.scrum,
-    //     //             folder: task.folder,
-    //     //             is_complete: task.is_complete
-    //     //         });
-    // }
-
-    //MARK:EXAMPLE
-    //----FIREBASE BRAIN
-    //listens to changes for database refrences. ie: task added to db.ref(user.uid) -> fires function to update scope.
-    //ps. this is always running and listening for changes, even user == null.
-    // $scope.auth.$onAuthStateChanged(function(user) {
-    //
-    //     if (user != null) {
-
-
-
-
-    // //LISTENER: USER TASK LIST
-    // var taskRef = firebase.database()
-    //     .ref()
-    //     .child('taskdb')
-    //     .child(user.uid)
-    // taskRef.on('value', snap => {
-    //     //scope init funcs.
-    //     console.log('ish changed in db :)')
-    //     updateUserObject(user, snap.val()) //snap.val() = user tasklist;
-    // })
-    //
-    //
-    // //LISTENER: GLOBAL BUG_INFO LIST
-    // var bugRef = firebase.database()
-    //     .ref()
-    //     .child('taskdb')
-    //     .child('bugs')
-    // bugRef.on('value', snap => {
-    //     var tempArray = makeSnapshotObject(snap.val())
-    //     $timeout(function() {
-    //         $scope.user.bugs = tempArray;
-    //     }, 0);
-    // })
-    //
-    //
-    // //LISTENER: SHARED POJO LISTS
-    // var pojoRef = firebase.database()
-    //     .ref()
-    //     .child('pojodb')
-    //
-    // // pojoRef.push({members:['wskcontact@gmail.com', 'andrewwiskus@gmail.com'], taskList: [{scrum:2,title:'make this work'}, {scrum:5, title:'fix this ish'}], title: 'myfirstpojo'});
-    // //badbadbadbadbad TODO: OPTIMIZE THIS //WILL CAUSE PROBLEMS IN FUTURE IF YOU DONT!!
-    // pojoRef.on('value', data => {
-    //     var userPojos = [];
-    //     var pojos = makeSnapshotObject(data.val()) // yes.. we're listening for all of them atm and pulling all in.. wtf
-    //     pojos.forEach(pojo => {
-    //         var isMember = _.indexOf(pojo.members, user.email);
-    //         if (isMember != -1) {
-    //             userPojos.push(pojo);
-    //         }
-    //     })
-    //
-    //     $timeout(function() {
-    //         $scope.user.pojos = userPojos;
-    //     }, 0)
-    //
-    // });
-    //
-    //
-    // //LISTENER: FRIENDS LIST/REQUESTS
-    // var friendRef = firebase.database()
-    //     .ref()
-    //     .child('frienddb')
-    //     .child(user.uid)
-    // friendRef.on('value', x => {
-    //     var tempArray = makeSnapshotObject(x.val())
-    //
-    //     $timeout(function() {
-    //         $scope.user.friends = tempArray;
-    //         findFriendRequests()
-    //     })
-    // })
-    //
-    //
-    //
-    // //LISTENER: GLOBAL USERDB W/ PUBLIC INFO
-    // var userdbRef = firebase.database()
-    //     .ref()
-    //     .child('userdb')
-    // checkNewUser(userdbRef, user)
-    //
-    // //LISTENER: USER SETTINGS
-    // var currentUserRef = firebase.database()
-    //     .ref()
-    //     .child('userdb')
-    //     .child(user.uid)
-    // currentUserRef.on('value', x => {
-    //     var tempArray = makeSnapshotObject(x.val())
-    //         //IF USER SETTINGS CHANGE:
-    //         //update $scope.user.settings
-    // })
-    //
-    // //LISTNER: TIMER -need for offline->online capablities
-    // //uses time started + time paused refrences to calcualte time remaining while comparing current time:
-    // //is_paused: time | null;
-    // //amount paused: int | null;
-    // //started_at: time;
-
-
-    //
-    //     }
-    // });
-
-
-
-
-
-
-
-
-    //Cool functions
-
-    //KEY EVENT LISTENER !!! :D
-    // $document.bind("keydown", function(event) {
-    //     console.log(event);
-    //     if (event.key == "Tab") {
-
-    //         event.preventDefault(); //would prevent from tabbing all over the screen
-    //     }
-    // });
-
-
+    console.log(initTime - Date.now());
 }]);

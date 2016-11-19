@@ -1,6 +1,6 @@
 <div id="game">
   <div class="screen" id="gameBoard">
-    <div ng-repeat="tile in gameTiles" style="width: {{tile.width}}px; height: {{tile.height}}px; float: left; background-image:url('../styles/grass{{tile.id}}.png')">
+    <div ng-repeat="tile in camera" style="width: {{tile.width}}px; height: {{tile.height}}px; float: left; background-image:url('../styles/{{tile.texture}}')">
 
     </div>
   </div>
