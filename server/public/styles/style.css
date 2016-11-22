@@ -11,3 +11,71 @@ div{
 main{
   width: 100%;
 }
+
+.infoBar{
+  padding-left: 315px;
+  position: fixed;
+  width: 100%;
+  height: 20px;
+  bottom: 0;
+  left: 0;
+  z-index: 9999;
+  background-color: white;
+}
+
+.keys{
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 315px;
+  padding: 7px;
+  font-size: 20px;
+  font-family: helvetica;
+  font-weight: lighter;
+  z-index: 1000;
+  background-color: white;
+}
+.keys p{
+  padding: 0;
+  margin: 3px;
+
+}
+
+.userSettingsContainer{
+  width: 315px;
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  right: 0;
+  background-color: white;
+  height: 100%;
+}
+.tileEditorContainer{
+  width: 315px;
+  position: fixed;
+  left: 0px;
+  top: 0;
+  height: 100%;
+  background-color: white;
+  z-index: 99 !important;
+  padding-left: 7px;
+  padding-right: 7px;
+  padding-bottom: 100px;
+  overflow-y: scroll;
+  padding-top: 75px;
+}
+
+.tileEditorContainer div {
+  width: 45px!important;
+  height:45px !important;
+  margin: 2.5px;
+}
+
+.userButton {
+  width: 100%;
+  height: 50px;
+  font-size: 30px;
+  padding: 3px;
+  margin: 10px;
+  font-weight: lighter;
+}

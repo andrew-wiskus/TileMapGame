@@ -1,8 +1,61 @@
 <div id="game">
-  <div class="screen" id="gameBoard">
-    <div ng-repeat="tile in camera track by $index"
-    ng-click="clickedTile(tile, $index)"
-    style="width: {{tile.width}}px; height: {{tile.height}}px; float: left; background-image:url('../styles/{{tile.texture}}')">
+    <div class="screen" id="gameBoard">
+        <div class="fill" ng-repeat="tile in camera track by $index" ng-click="clickedTile(tile, $index)" style="
+           width: {{tile.width}}px;
+           height: {{tile.height}}px;
+           float: left;
+           background-image:url('../styles/{{tile.texture}}');
+           background-size: {{tile.width}}px {{tile.height}}px
+           ">
+        </div>
     </div>
+
+    <div class="infoBar" id="statusText">
+        <p>Position: [{{cameraPosition.x}},{{cameraPosition.y}}] <span class="currentuser"> Current User: <i>{{user === null ? 'null' : user.email }} </i> <button ng-click="user === null ? signIn() : signOut()">{{user === null ? 'login' : 'logoff'}}</button></span></p>
+
+    </div>
+
+</div>
+
+<div ng-if="showTileEditor" class="keys">
+    <p>WASD ---pan camera</p>
+    <p>E ------Toggle Editor</p>
+    <p>Tab ------Toggle User Settings</p>
+</div>
+<div class="currentTile" ng-if="showTileEditor && currentTile != ''">
+    <style>
+        body {
+            cursor:url(../styles/z1/{{currentTile}}.gif) 16 16,
+            auto;
+        }
+
+        #gameBoard div:hover {
+            opacity: 0.7;
+        }
+    </style>
+
+</div>
+<div ng-if="showTileEditor" class="tileEditorContainer">
+    <div class="fill" ng-repeat="tile in imageDict track by $index" ng-click="chooseTile(tile.id)" style="
+     width: {{camera[0].width}}px;
+     height: {{camera[0].height}}px;
+     float: left;
+     background-image:url('../styles/z1/{{tile.id}}.gif');
+     background-size: 45px 45px;
+     {{currentTile == tile.id ? 'border: 5px solid slategrey; opacity: 0.7; background-size: 35px 35px' : ''}}
+     ">
+    </div>
+
+</div>
+
+<div ng-if="showUserSettings" class="userSettingsContainer">
+  <div ng-if="user != undefined">
+    <button ng-click="saveMapPressed()" class="userButton">save map</button>
+    <button ng-click="loadMapPressed()" class="userButton">load map</button>
+    <button ng-click="newMapPressed()" class="userButton">new map</button>
+  </div>
+  <div ng-if="user == undefined">
+    <h3>Sign in to save your maps :)</h3>
+    <button ng-click="signIn()" class="userButton">log in/create account</button>
   </div>
 </div>
